@@ -1,0 +1,348 @@
+AI-POWERED
+Feedback Classification System
+Project Documentation & Development Blueprint
+A practical AI-powered web application where users submit feedback, an NLP model classifies it, and administrators review, verify, and analyze the results.
+1. Project Overview
+The project is a web-based feedback classification system powered by AI/NLP. The goal is to demonstrate how an AI model can be integrated into a real, usable application rather than presenting only a machine-learning notebook.
+The application has two roles:
+User — submits feedback, sees the AI result, can correct it, and views previous reviews.
+Admin — sees all feedback, manages classifications, verifies reviews, and views analytics.
+The project intentionally avoids multi-company registration, multi-tenancy, billing, custom company URLs, and other SaaS complexity. The main focus remains AI-powered feedback analysis.
+2. Main Product Flow
+User
+ ↓
+Login
+ ↓
+Submit Feedback
+ ↓
+Backend receives review
+ ↓
+AI/NLP model analyzes review
+ ↓
+Category + Sentiment + Confidence
+ ↓
+Result shown to user
+ ↓
+User may correct category
+ ↓
+Review stored in MongoDB
+ ↓
+Admin reviews / verifies it
+3. Technology Stack
+Technology
+Purpose
+AI / NLP
+Feedback classification and sentiment analysis
+React
+User and administrator interfaces
+MongoDB
+Users, reviews, predictions, and application data
+Fast
+ API
+Communication between application components
+Cloud Deployment
+Online deployment of the complete project
+4. User Side
+4.1 User Navigation
+Dashboard
+Submit Feedback
+My Reviews
+Profile
+Security / Change Password
+About
+Logout
+4.2 Feedback Submission
+User:
+"Please add dark mode to the application."
+        ↓
+AI Analysis:
+Sentiment: Neutral
+Category: Feature Request
+Confidence: 67%
+4.3 User Correction
+If the AI prediction is incorrect, the user can select the appropriate category.
+AI Prediction:
+Complaint
+Confidence: 67%
+User Correction:
+Feature Request
+4.4 User Review History
+Review text
+Date/time
+AI category
+Sentiment
+Confidence
+User-selected category
+Admin verification/status
+5. Admin Side
+Admin login
+Dashboard
+All reviews
+Search and filtering
+Review details
+Classification correction
+User information
+Review status
+Analytics
+5.1 Admin Dashboard
+ADMIN DASHBOARD
+Total Reviews    Positive    Negative    Pending
+    1,248            642         406         200
+Sentiment Distribution
+Positive     █████████████
+Negative     ████████
+Neutral      ███
+Category Distribution
+Complaint
+Praise
+Bug Report
+Feature Request
+Suggestion
+5.2 Review Detail
+Review #2026-00123
+Customer: Priya Mehta
+"The payment page is extremely slow..."
+AI Analysis
+Category: Complaint
+Sentiment: Negative
+Confidence: 94%
+User Classification
+Complaint
+Admin Decision
+[ Complaint ▼ ]
+Status
+Pending
+[ Save Changes ]
+5.3 Review Status
+Pending
+Reviewed
+In Progress
+Resolved
+Ignored
+6. Review Data Model
+{
+  "userId": "...",
+  "review": "Please add dark mode...",
+  "predictedCategory": "Complaint",
+  "userCategory": "Feature Request",
+  "finalCategory": "Feature Request",
+  "sentiment": "Neutral",
+  "confidence": 0.67,
+  "verifiedByAdmin": true,
+  "status": "Reviewed",
+  "createdAt": "..."
+}
+The important design decision is to preserve the AI prediction separately from later human corrections.
+7. AI / NLP Component
+7.1 Sentiment Classes
+Positive
+Negative
+Neutral
+7.2 Feedback Categories
+Complaint
+Praise
+Bug Report
+Feature Request
+Suggestion
+Question
+Other
+7.3 ML Pipeline
+Dataset
+ ↓
+Text Cleaning
+ ↓
+Train / Validation / Test Split
+ ↓
+Text Vectorization
+ ↓
+Classification Model
+ ↓
+Evaluation
+ ↓
+Save Model
+ ↓
+Prediction API
+A strong baseline can be TF-IDF with Logistic Regression or Linear SVM. Transformer-based models can be evaluated later if they provide useful improvements.
+7.4 Model Evaluation
+Accuracy
+Precision
+Recall
+F1-score
+Confusion Matrix
+Per-class performance
+8. AI + Application Architecture
+                 React Frontend
+                       │
+                       ▼
+                  Backend API
+                  /         \
+                 /           \
+                ▼             ▼
+           MongoDB         AI/NLP Service
+                                  │
+                                  ▼
+                             NLP Model
+The React frontend communicates with the backend through APIs. The backend handles authentication, review data, and MongoDB operations. When a user submits feedback, the backend sends the review text to the AI/NLP service, receives the predicted category, sentiment, and confidence, and then stores the result in MongoDB. Keeping the AI service separate also makes the model easier to update and deploy.
+9. Main UI Pages
+Area
+Page
+Purpose
+Public
+Landing / About
+Explain the product and AI feature
+Auth
+Login / Register
+Account access
+User
+Dashboard
+Submit feedback and see recent activity
+User
+Feedback Result
+Display AI classification and confidence
+User
+My Reviews
+Review history
+User
+Review Detail
+Detailed result and status
+User
+Profile
+Account information
+User
+Security
+Password update
+Admin
+Admin Dashboard
+Metrics and charts
+Admin
+All Reviews
+Search, filter, and manage feedback
+Admin
+Review Detail
+Verify or modify classification
+10. MongoDB Structure
+MongoDB
+│
+├── users
+│     ├── username
+│     ├── email
+│     ├── passwordHash
+│     └── role
+│
+└── reviews
+      ├── userId
+      ├── review
+      ├── predictedCategory
+      ├── userCategory
+      ├── finalCategory
+      ├── sentiment
+      ├── confidence
+      ├── verifiedByAdmin
+      ├── status
+      └── timestamps
+11. Authentication & Authorization
+User Login
+    ↓
+Authentication
+    ↓
+User Dashboard
+Admin Login
+    ↓
+Authentication
+    ↓
+Role Check
+    ↓
+Admin Dashboard
+Passwords must be securely hashed.
+Protected API endpoints must require authentication.
+Admin endpoints must verify the user's admin role on the server.
+Users should only be able to access their own reviews.
+12. Analytics
+Total reviews
+Positive / negative / neutral distribution
+Category distribution
+Pending vs resolved reviews
+Review trends over time
+Low-confidence predictions
+13. Deployment
+React Frontend
+      │
+      ▼
+Cloud Hosting
+      │
+      ▼
+Backend API ─────────► MongoDB
+      │
+      ▼
+   AI Service
+      │
+      ▼
+  NLP Model
+Use environment variables for secrets.
+Deploy frontend, backend, AI service, and database appropriately.
+Test the complete production flow after deployment.
+14. Development Phases
+Phase 1 — AI Model
+Prepare dataset
+Train classifier
+Evaluate model
+Save model
+Phase 2 — AI API
+Create prediction endpoint
+Send review text
+Return category, sentiment, confidence
+Phase 3 — User Application
+Login/register
+Dashboard
+Submit feedback
+Show AI result
+My reviews
+Phase 4 — Admin Application
+Admin login
+Dashboard
+All reviews
+Review details
+Verification
+Phase 5 — Polish
+Search
+Filtering
+Charts
+Profile/security
+UI/UX improvements
+Phase 6 — Deployment
+Deploy frontend
+Deploy backend
+Deploy AI service
+Connect MongoDB
+Test production
+15. Recommended Final Scope
+USER
+ ├── Login / Register
+ ├── Dashboard
+ ├── Submit Feedback
+ ├── AI Classification
+ ├── Correct Classification
+ ├── My Reviews
+ ├── Review Details
+ ├── Profile
+ ├── Change Password
+ └── About
+ADMIN
+ ├── Login
+ ├── Dashboard
+ ├── All Reviews
+ ├── Search / Filter
+ ├── Review Details
+ ├── Verify / Modify Classification
+ ├── Review Status
+ └── Analytics
+This scope keeps the project clearly centered around AI/NLP while still demonstrating frontend development, database usage, authentication, API integration, deployment, and real-world product thinking.
+16. Optional Future Improvements
+Topic extraction
+Emotion detection
+Urgency detection
+AI-generated review summaries
+Trend detection
+Model versioning
+Public API for external applications
+These features should only be added after the core application is complete and deployed.

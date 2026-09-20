@@ -42,10 +42,12 @@ export default function UserDashboard() {
           ></textarea>
           
           <div className="flex flex-wrap items-center gap-2 mb-4">
-            <span className="px-3 py-1 rounded-full border border-slate-200 text-sm text-slate-600 cursor-pointer hover:bg-slate-50">Bug Report</span>
-            <span className="px-3 py-1 rounded-full border border-slate-200 text-sm text-slate-600 cursor-pointer hover:bg-slate-50">Feature Request</span>
             <span className="px-3 py-1 rounded-full border border-slate-200 text-sm text-slate-600 cursor-pointer hover:bg-slate-50">Complaint</span>
             <span className="px-3 py-1 rounded-full border border-slate-200 text-sm text-slate-600 cursor-pointer hover:bg-slate-50">Praise</span>
+            <span className="px-3 py-1 rounded-full border border-slate-200 text-sm text-slate-600 cursor-pointer hover:bg-slate-50">Bug Report</span>
+            <span className="px-3 py-1 rounded-full border border-slate-200 text-sm text-slate-600 cursor-pointer hover:bg-slate-50">Feature Request</span>
+            <span className="px-3 py-1 rounded-full border border-slate-200 text-sm text-slate-600 cursor-pointer hover:bg-slate-50">Suggestion</span>
+            <span className="px-3 py-1 rounded-full border border-slate-200 text-sm text-slate-600 cursor-pointer hover:bg-slate-50">Question</span>
             <span className="px-3 py-1 rounded-full border border-slate-200 text-sm text-slate-600 cursor-pointer hover:bg-slate-50">Other</span>
           </div>
           

@@ -77,9 +77,12 @@ export default function AdminReviewDetail() {
               <label className="block text-sm font-bold text-slate-900 uppercase tracking-wider mb-2">Classification</label>
               <select className="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary-500 font-medium text-slate-900">
                 <option>Complaint</option>
-                <option>Feature Request</option>
-                <option>Bug Report</option>
                 <option>Praise</option>
+                <option>Bug Report</option>
+                <option>Feature Request</option>
+                <option>Suggestion</option>
+                <option>Question</option>
+                <option>Other</option>
               </select>
             </div>
 
@@ -88,6 +91,7 @@ export default function AdminReviewDetail() {
               <select className="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary-500 font-medium text-slate-900">
                 <option>Pending</option>
                 <option>Reviewed</option>
+                <option>In Progress</option>
                 <option>Resolved</option>
                 <option>Ignored</option>
               </select>

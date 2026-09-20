@@ -46,21 +46,25 @@ export default function FeedbackAnalysis() {
         <h2 className="text-lg font-bold text-slate-900">Select or modify category</h2>
         
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          <label className="flex items-center gap-3 p-3 rounded-lg border-2 border-primary-500 bg-primary-50 cursor-pointer">
-            <input type="radio" name="category" className="text-primary-600 focus:ring-primary-500 w-4 h-4" defaultChecked />
-            <span className="font-medium text-slate-900 text-sm">Feature Request</span>
-          </label>
           <label className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
             <input type="radio" name="category" className="text-primary-600 focus:ring-primary-500 w-4 h-4" />
             <span className="font-medium text-slate-700 text-sm">Complaint</span>
           </label>
           <label className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
             <input type="radio" name="category" className="text-primary-600 focus:ring-primary-500 w-4 h-4" />
-            <span className="font-medium text-slate-700 text-sm">Bug Report</span>
+            <span className="font-medium text-slate-700 text-sm">Praise</span>
           </label>
           <label className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
             <input type="radio" name="category" className="text-primary-600 focus:ring-primary-500 w-4 h-4" />
-            <span className="font-medium text-slate-700 text-sm">Praise</span>
+            <span className="font-medium text-slate-700 text-sm">Bug Report</span>
+          </label>
+          <label className="flex items-center gap-3 p-3 rounded-lg border-2 border-primary-500 bg-primary-50 cursor-pointer">
+            <input type="radio" name="category" className="text-primary-600 focus:ring-primary-500 w-4 h-4" defaultChecked />
+            <span className="font-medium text-slate-900 text-sm">Feature Request</span>
+          </label>
+          <label className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
+            <input type="radio" name="category" className="text-primary-600 focus:ring-primary-500 w-4 h-4" />
+            <span className="font-medium text-slate-700 text-sm">Suggestion</span>
           </label>
           <label className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
             <input type="radio" name="category" className="text-primary-600 focus:ring-primary-500 w-4 h-4" />

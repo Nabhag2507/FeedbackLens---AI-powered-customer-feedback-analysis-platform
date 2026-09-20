@@ -23,6 +23,7 @@ export default function AllReviews() {
             <button className="px-3 py-1.5 text-sm font-medium bg-white border border-slate-200 shadow-sm rounded-md text-slate-900">All</button>
             <button className="px-3 py-1.5 text-sm font-medium hover:bg-slate-200/50 rounded-md text-slate-600">Pending</button>
             <button className="px-3 py-1.5 text-sm font-medium hover:bg-slate-200/50 rounded-md text-slate-600">Reviewed</button>
+            <button className="px-3 py-1.5 text-sm font-medium hover:bg-slate-200/50 rounded-md text-slate-600">In Progress</button>
             <button className="px-3 py-1.5 text-sm font-medium hover:bg-slate-200/50 rounded-md text-slate-600">Resolved</button>
             <button className="px-3 py-1.5 text-sm font-medium hover:bg-slate-200/50 rounded-md text-slate-600">Ignored</button>
           </div>
@@ -39,13 +40,19 @@ export default function AllReviews() {
             <div className="flex gap-2">
               <select className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary-500">
                 <option>All Categories</option>
-                <option>Complaints</option>
-                <option>Feature Requests</option>
+                <option>Complaint</option>
+                <option>Praise</option>
+                <option>Bug Report</option>
+                <option>Feature Request</option>
+                <option>Suggestion</option>
+                <option>Question</option>
+                <option>Other</option>
               </select>
               <select className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary-500">
                 <option>All Sentiments</option>
                 <option>Positive</option>
                 <option>Negative</option>
+                <option>Neutral</option>
               </select>
             </div>
           </div>
