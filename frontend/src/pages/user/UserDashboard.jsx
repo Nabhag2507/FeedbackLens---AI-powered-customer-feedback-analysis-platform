@@ -13,7 +13,7 @@ export default function UserDashboard() {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/feedback', {
+      const response = await fetch('https://feedbacklens-ai-powered-customer.onrender.com/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: 'user_123', text: text })

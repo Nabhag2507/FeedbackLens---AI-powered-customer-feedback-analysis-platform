@@ -5,7 +5,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/feedback')
+    fetch('https://feedbacklens-ai-powered-customer.onrender.com/api/feedback')
       .then(res => res.json())
       .then(data => {
         setFeedbacks(data.feedbacks || []);
