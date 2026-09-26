@@ -9,12 +9,6 @@ export default function MainLayout() {
           <Layers className="text-primary-500" />
           <span>FeedbackLens</span>
         </Link>
-        <div className="hidden md:flex items-center gap-6 text-sm">
-          <a href="#features" className="hover:text-primary-400">Features</a>
-          <a href="#pricing" className="hover:text-primary-400">Pricing</a>
-          <a href="#about" className="hover:text-primary-400">About</a>
-          <a href="#contact" className="hover:text-primary-400">Contact</a>
-        </div>
         <div className="flex items-center gap-4">
           <Link to="/login" className="text-sm hover:text-primary-400">Login</Link>
           <Link to="/login" className="px-4 py-2 bg-primary-600 hover:bg-primary-700 rounded-lg text-sm font-medium transition-colors">

@@ -33,10 +33,10 @@ export default function LandingPage() {
                 Get Started
                 <ChevronRight className="w-4 h-4" />
               </Link>
-              <button className="px-6 py-3.5 bg-slate-800/80 hover:bg-slate-700 backdrop-blur-md border border-slate-700 rounded-xl font-medium transition-all active:scale-[0.98] flex items-center gap-2 shadow-lg">
-                <BarChart3 className="w-4 h-4 text-slate-400" />
-                Watch Demo
-              </button>
+              <Link to="/admin/login" className="px-6 py-3.5 bg-slate-800/80 hover:bg-slate-700 backdrop-blur-md border border-slate-700 rounded-xl font-medium transition-all active:scale-[0.98] flex items-center gap-2 shadow-lg text-white">
+                <Shield className="w-4 h-4 text-slate-400" />
+                Admin Portal
+              </Link>
             </div>
             
             <div className="grid grid-cols-2 gap-6 pt-8 border-t border-slate-800/50">
