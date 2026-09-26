@@ -16,6 +16,7 @@ import {
 import { useState } from 'react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { UserButton } from '@clerk/react';
 
 export function cn(...inputs) {
   return twMerge(clsx(inputs));
@@ -122,13 +123,20 @@ export default function DashboardLayout({ role = 'user' }) {
               <Bell className="w-5 h-5" />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 shadow-[0_0_5px_rgba(239,68,68,0.5)]" />
             </button>
-            <div className="flex items-center gap-2 cursor-pointer hover:bg-slate-100/50 p-1.5 rounded-lg transition-colors" onClick={() => navigate(role === 'admin' ? '/admin/dashboard' : '/dashboard/profile')}>
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-primary-600 to-primary-400 flex items-center justify-center text-white font-bold text-sm shadow-md">
-                {role === 'admin' ? 'A' : 'R'}
-              </div>
-              <span className="text-sm font-semibold text-slate-700 hidden sm:block">
-                {role === 'admin' ? 'Admin' : 'Rahul Sharma'}
-              </span>
+            <div className="flex items-center gap-2 cursor-pointer hover:bg-slate-100/50 p-1.5 rounded-lg transition-colors">
+              {role === 'admin' ? (
+                <button 
+                  onClick={() => {
+                    localStorage.removeItem('adminAuth');
+                    navigate('/admin/login');
+                  }}
+                  className="px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+                >
+                  Sign Out
+                </button>
+              ) : (
+                <UserButton afterSignOutUrl="/" />
+              )}
             </div>
           </div>
         </header>

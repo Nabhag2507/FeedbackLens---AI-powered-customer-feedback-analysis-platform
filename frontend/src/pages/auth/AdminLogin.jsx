@@ -1,12 +1,20 @@
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Layers } from 'lucide-react';
 
 export default function AdminLogin() {
   const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleLogin = (e) => {
     e.preventDefault();
-    navigate('/admin/dashboard');
+    if (email === 'adminfbl@gmail.com' && password === 'adminfbl123') {
+      localStorage.setItem('adminAuth', 'true');
+      navigate('/admin/dashboard');
+    } else {
+      alert('Invalid admin credentials. Hint: admin@acme.com / admin123');
+    }
   };
 
   return (
@@ -31,6 +39,8 @@ export default function AdminLogin() {
               placeholder="admin@acme.com" 
               className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-colors"
               required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -47,6 +57,8 @@ export default function AdminLogin() {
               placeholder="••••••••" 
               className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-colors"
               required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">

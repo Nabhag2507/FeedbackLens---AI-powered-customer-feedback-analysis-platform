@@ -3,7 +3,8 @@ import os
 # Paths
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_PATH = os.path.join(BASE_DIR, "data", "final dataset.csv")
-MODEL_SAVE_DIR = os.path.join(BASE_DIR, "models", "category_model")
+
+HF_MODEL_REPO = "Nabhag2507/feedbacklens-classifier"
 
 # Model configurations
 MODEL_NAME = "distilbert-base-uncased"

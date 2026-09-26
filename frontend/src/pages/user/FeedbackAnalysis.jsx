@@ -1,8 +1,15 @@
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Sparkles } from 'lucide-react';
 
 export default function FeedbackAnalysis() {
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // If no data (user just refreshed page), fallback to some defaults
+  const { aiData, rawText } = location.state || { 
+    aiData: { category: "Unknown", sentiment: "Unknown", confidence: 0 },
+    rawText: "No text provided"
+  };
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -12,7 +19,7 @@ export default function FeedbackAnalysis() {
       </div>
 
       <div className="bg-slate-50 p-6 rounded-xl border border-slate-200">
-        <p className="text-slate-700 italic">"Please add dark mode to the application. It would be much easier on the eyes during night time."</p>
+        <p className="text-slate-700 italic">"{rawText}"</p>
       </div>
 
       <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-6">
@@ -29,15 +36,15 @@ export default function FeedbackAnalysis() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
             <p className="text-xs text-slate-500 font-medium mb-1 uppercase tracking-wider">Predicted Category</p>
-            <p className="font-semibold text-slate-900">Complaint</p>
+            <p className="font-semibold text-slate-900 capitalize">{aiData.category}</p>
           </div>
           <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
             <p className="text-xs text-slate-500 font-medium mb-1 uppercase tracking-wider">Sentiment</p>
-            <p className="font-semibold text-slate-900">Neutral</p>
+            <p className="font-semibold text-slate-900 capitalize">{aiData.sentiment}</p>
           </div>
           <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
             <p className="text-xs text-slate-500 font-medium mb-1 uppercase tracking-wider">Confidence</p>
-            <p className="font-semibold text-slate-900">67%</p>
+            <p className="font-semibold text-slate-900">{Math.round(aiData.confidence * 100)}%</p>
           </div>
         </div>
       </div>

@@ -3,7 +3,7 @@ import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import nltk
-import config
+from src import config
 import os
 
 # Download VADER lexicon if not already present
@@ -13,24 +13,19 @@ except LookupError:
     nltk.download('vader_lexicon', quiet=True)
 
 class FeedbackAnalyzer:
-    def __init__(self, model_path: str = config.MODEL_SAVE_DIR):
+    def __init__(self, model_path: str = config.HF_MODEL_REPO):
         """
-        Initializes the VADER sentiment analyzer and the fine-tuned category classifier.
+        Initializes VADER and downloads the fine-tuned classifier from Hugging Face.
         """
         self.sia = SentimentIntensityAnalyzer()
         self.threshold = config.CONFIDENCE_THRESHOLD
         
-        # Check if the model directory exists and has files (after Kaggle download)
-        if not os.path.exists(model_path) or not os.listdir(model_path):
-            print(f"WARNING: The model directory '{model_path}' is empty or missing.")
-            print("Please train the model on Kaggle, download it, and place the files here.")
-            print("Running in MOCK mode for now (will return dummy category).")
-            self.is_mock = True
-        else:
-            self.is_mock = False
-            self.tokenizer = AutoTokenizer.from_pretrained(model_path)
-            self.model = AutoModelForSequenceClassification.from_pretrained(model_path)
-            self.model.eval() # Set to evaluation mode
+        print(f"Downloading/Loading model from Hugging Face: {model_path}...")
+        self.tokenizer = AutoTokenizer.from_pretrained(model_path)
+        self.model = AutoModelForSequenceClassification.from_pretrained(model_path)
+        self.model.eval() # Set to evaluation mode
+        print("Model loaded successfully!")
+        self.is_mock = False
 
     def get_sentiment(self, text: str) -> str:
         """

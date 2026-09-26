@@ -1,17 +1,38 @@
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useUser } from '@clerk/react';
 
 export default function UserDashboard() {
   const navigate = useNavigate();
+  const { user } = useUser();
 
-  const handleFeedbackSubmit = (e) => {
+  const [text, setText] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleFeedbackSubmit = async (e) => {
     e.preventDefault();
-    navigate('/dashboard/feedback/analysis');
+    setLoading(true);
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: 'user_123', text: text })
+      });
+      const data = await response.json();
+      
+      // Navigate to the analysis page and pass the real AI data!
+      navigate('/dashboard/feedback/analysis', { state: { aiData: data.analysis, rawText: text } });
+    } catch (error) {
+      console.error("Error connecting to backend:", error);
+      alert("Failed to connect to AI backend.");
+    }
+    setLoading(false);
   };
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Hello, Rahul! 👋</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Hello, {user?.firstName || 'there'}! 👋</h1>
         <p className="text-slate-500">Your feedback helps us build a better product.</p>
       </div>
 
@@ -39,6 +60,8 @@ export default function UserDashboard() {
             rows="4"
             placeholder="How was your experience? Tell us what you think..."
             required
+            value={text}
+            onChange={(e) => setText(e.target.value)}
           ></textarea>
           
           <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -51,8 +74,8 @@ export default function UserDashboard() {
             <span className="px-3 py-1 rounded-full border border-slate-200 text-sm text-slate-600 cursor-pointer hover:bg-slate-50">Other</span>
           </div>
           
-          <button type="submit" className="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors">
-            Analyze & Submit
+          <button type="submit" disabled={loading} className="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50">
+            {loading ? "Analyzing..." : "Analyze & Submit"}
           </button>
         </form>
       </div>
