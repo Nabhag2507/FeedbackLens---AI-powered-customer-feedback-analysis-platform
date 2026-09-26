@@ -24,20 +24,10 @@ export function cn(...inputs) {
 
 const userNav = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Submit Feedback', href: '/dashboard/feedback/analysis', icon: MessageSquarePlus },
-  { name: 'My Reviews', href: '/dashboard/reviews', icon: List },
-  { name: 'Profile', href: '/dashboard/profile', icon: User },
-  { name: 'Security', href: '/dashboard/settings/password', icon: Shield },
-  { name: 'Help & Support', href: '#', icon: HelpCircle },
 ];
 
 const adminNav = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-  { name: 'Reviews', href: '/admin/reviews', icon: List },
-  { name: 'Analytics', href: '#', icon: Search },
-  { name: 'Customers', href: '#', icon: Users },
-  { name: 'Categories', href: '#', icon: Layers },
-  { name: 'Settings', href: '#', icon: Settings },
 ];
 
 export default function DashboardLayout({ role = 'user' }) {

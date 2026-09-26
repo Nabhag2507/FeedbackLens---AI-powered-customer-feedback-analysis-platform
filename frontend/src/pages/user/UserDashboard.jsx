@@ -1,106 +1,132 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import { useUser } from '@clerk/react';
 
 export default function UserDashboard() {
-  const navigate = useNavigate();
   const { user } = useUser();
-
-  const [text, setText] = useState('');
+  const [feedback, setFeedback] = useState('');
   const [loading, setLoading] = useState(false);
+  
+  const [feedbacks, setFeedbacks] = useState([]);
+  const [fetching, setFetching] = useState(true);
 
-  const handleFeedbackSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const response = await fetch('https://feedbacklens-ai-powered-customer.onrender.com/api/feedback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: 'user_123', text: text })
+  const fetchFeedbacks = () => {
+    if (!user) return;
+    fetch(`https://feedbacklens-ai-powered-customer.onrender.com/api/feedback?user_id=${user.id}`)
+      .then(res => res.json())
+      .then(data => {
+        setFeedbacks(data.feedbacks || []);
+        setFetching(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setFetching(false);
       });
-      const data = await response.json();
-      
-      // Navigate to the analysis page and pass the real AI data!
-      navigate('/dashboard/feedback/analysis', { state: { aiData: data.analysis, rawText: text } });
-    } catch (error) {
-      console.error("Error connecting to backend:", error);
-      alert("Failed to connect to AI backend.");
-    }
-    setLoading(false);
   };
 
+  useEffect(() => {
+    fetchFeedbacks();
+  }, [user]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!feedback.trim()) return;
+    
+    setLoading(true);
+    try {
+      await fetch('https://feedbacklens-ai-powered-customer.onrender.com/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: user.id,
+          text: feedback
+        })
+      });
+      setFeedback(''); // clear input
+      fetchFeedbacks(); // instantly refresh the list!
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const totalReviews = feedbacks.length;
+  const positiveCount = feedbacks.filter(f => f.ai_analysis?.sentiment === "positive").length;
+  const negativeCount = feedbacks.filter(f => f.ai_analysis?.sentiment === "negative").length;
+  const neutralCount = feedbacks.filter(f => f.ai_analysis?.sentiment === "neutral").length;
+
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Hello, {user?.firstName || 'there'}! 👋</h1>
-        <p className="text-slate-500">Your feedback helps us build a better product.</p>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { label: 'Total Reviews', value: '12', color: 'text-primary-600', bg: 'bg-primary-50' },
-          { label: 'Compliments', value: '5', color: 'text-green-600', bg: 'bg-green-50' },
-          { label: 'Complaints', value: '4', color: 'text-red-600', bg: 'bg-red-50' },
-          { label: 'Feature Requests', value: '3', color: 'text-blue-600', bg: 'bg-blue-50' },
-        ].map((stat) => (
-          <div key={stat.label} className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col items-center justify-center hover:-translate-y-1 transition-transform duration-300">
-            <div className={`w-14 h-14 rounded-full ${stat.bg} flex items-center justify-center mb-3`}>
-              <span className={`text-2xl font-bold ${stat.color}`}>{stat.value}</span>
-            </div>
-            <span className="text-sm text-slate-500 font-semibold">{stat.label}</span>
+    <div className="space-y-6 max-w-4xl mx-auto">
+      <div className="bg-white/80 backdrop-blur-sm p-6 sm:p-8 rounded-2xl border border-white/40 shadow-sm">
+        <h1 className="text-2xl font-bold text-slate-900 mb-2">Hi, {user?.firstName}! 👋</h1>
+        <p className="text-slate-500 mb-6">How was your experience today? Our AI will analyze your feedback instantly.</p>
+        
+        <form onSubmit={handleSubmit}>
+          <div className="relative mb-4">
+            <textarea
+              className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 min-h-[120px] resize-none"
+              placeholder="E.g. The app is really fast but the dark mode hurts my eyes..."
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
+              disabled={loading}
+            />
           </div>
-        ))}
-      </div>
-
-      <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-        <h2 className="text-lg font-bold text-slate-900 mb-4">Share Your Feedback</h2>
-        <form onSubmit={handleFeedbackSubmit}>
-          <textarea 
-            className="w-full p-4 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 mb-4 resize-none"
-            rows="4"
-            placeholder="How was your experience? Tell us what you think..."
-            required
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-          ></textarea>
-          
-          <div className="flex flex-wrap items-center gap-2 mb-4">
-            <span className="px-3 py-1 rounded-full border border-slate-200 text-sm text-slate-600 cursor-pointer hover:bg-slate-50">Complaint</span>
-            <span className="px-3 py-1 rounded-full border border-slate-200 text-sm text-slate-600 cursor-pointer hover:bg-slate-50">Praise</span>
-            <span className="px-3 py-1 rounded-full border border-slate-200 text-sm text-slate-600 cursor-pointer hover:bg-slate-50">Bug Report</span>
-            <span className="px-3 py-1 rounded-full border border-slate-200 text-sm text-slate-600 cursor-pointer hover:bg-slate-50">Feature Request</span>
-            <span className="px-3 py-1 rounded-full border border-slate-200 text-sm text-slate-600 cursor-pointer hover:bg-slate-50">Suggestion</span>
-            <span className="px-3 py-1 rounded-full border border-slate-200 text-sm text-slate-600 cursor-pointer hover:bg-slate-50">Question</span>
-            <span className="px-3 py-1 rounded-full border border-slate-200 text-sm text-slate-600 cursor-pointer hover:bg-slate-50">Other</span>
+          <div className="flex justify-end">
+            <button 
+              type="submit" 
+              disabled={loading || !feedback.trim()}
+              className="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white rounded-xl font-medium shadow-md transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Analyzing AI...' : 'Submit Feedback'}
+            </button>
           </div>
-          
-          <button type="submit" disabled={loading} className="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50">
-            {loading ? "Analyzing..." : "Analyze & Submit"}
-          </button>
         </form>
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-slate-200 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-slate-900">Recent Reviews</h2>
-          <Link to="/dashboard/reviews" className="text-sm font-medium text-primary-600 hover:text-primary-700">View All</Link>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-slate-100 shadow-sm">
+          <span className="text-sm font-semibold text-slate-500 block mb-2">My Total Reviews</span>
+          <span className="text-3xl font-extrabold text-slate-900">{fetching ? '-' : totalReviews}</span>
         </div>
-        <div className="divide-y divide-slate-100">
-          {[
-            { text: 'Please add dark mode, it would be great!', category: 'Feature Request', date: 'Mar 15, 2024', status: 'Pending', statusColor: 'bg-yellow-100 text-yellow-700', catColor: 'bg-primary-50 text-primary-700' },
-            { text: 'The app is really easy to use. Great work!', category: 'Praise', date: 'Mar 12, 2024', status: 'Verified', statusColor: 'bg-green-100 text-green-700', catColor: 'bg-green-50 text-green-700' },
-            { text: 'Sometimes the app crashes on login.', category: 'Bug Report', date: 'Mar 10, 2024', status: 'Verified', statusColor: 'bg-green-100 text-green-700', catColor: 'bg-red-50 text-red-700' },
-          ].map((review, i) => (
-            <div key={i} className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <p className="text-slate-700 flex-1 truncate pr-4">{review.text}</p>
-              <div className="flex flex-wrap items-center gap-3">
-                <span className={`px-2 py-1 rounded text-xs font-medium ${review.catColor}`}>{review.category}</span>
-                <span className="text-sm text-slate-500 whitespace-nowrap">{review.date}</span>
-                <Link to={`/dashboard/reviews/${i}`} className="text-sm font-medium text-primary-600 hover:text-primary-700">View</Link>
+        <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-slate-100 shadow-sm">
+          <span className="text-sm font-semibold text-slate-500 block mb-2">Positive</span>
+          <span className="text-3xl font-extrabold text-green-600">{fetching ? '-' : positiveCount}</span>
+        </div>
+        <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-slate-100 shadow-sm">
+          <span className="text-sm font-semibold text-slate-500 block mb-2">Negative</span>
+          <span className="text-3xl font-extrabold text-red-600">{fetching ? '-' : negativeCount}</span>
+        </div>
+        <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-slate-100 shadow-sm">
+          <span className="text-sm font-semibold text-slate-500 block mb-2">Neutral</span>
+          <span className="text-3xl font-extrabold text-slate-400">{fetching ? '-' : neutralCount}</span>
+        </div>
+      </div>
+
+      <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mt-6">
+        <h2 className="text-lg font-bold text-slate-900 mb-6">My Feedback History</h2>
+        {fetching ? (
+          <p className="text-slate-500 text-center py-4">Loading...</p>
+        ) : feedbacks.length === 0 ? (
+          <p className="text-slate-500 text-center py-4">You haven't submitted any feedback yet.</p>
+        ) : (
+          <div className="space-y-4">
+            {feedbacks.map((f) => (
+              <div key={f._id} className="p-4 border border-slate-100 rounded-lg bg-slate-50 flex flex-col gap-2">
+                 <div className="flex justify-between items-center">
+                   <span className="text-sm font-semibold capitalize px-2 py-1 bg-white rounded shadow-sm border border-slate-200">
+                     {f.ai_analysis?.category}
+                   </span>
+                   <span className={`text-sm font-bold capitalize ${f.ai_analysis?.sentiment === 'positive' ? 'text-green-600' : f.ai_analysis?.sentiment === 'negative' ? 'text-red-600' : 'text-slate-500'}`}>
+                     {f.ai_analysis?.sentiment} ({Math.round(f.ai_analysis?.confidence * 100)}%)
+                   </span>
+                 </div>
+                 <p className="text-slate-700">"{f.raw_text}"</p>
+                 <p className="text-xs text-slate-400">{new Date(f.submitted_at).toLocaleString()}</p>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
