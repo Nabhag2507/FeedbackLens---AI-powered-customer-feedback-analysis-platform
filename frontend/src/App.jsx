@@ -49,7 +49,7 @@ function App() {
           {/* Clerk Drop-in SignIn component */}
           <Route path="/login" element={
             <div className="flex justify-center items-center py-12">
-              <SignIn routing="path" path="/login" fallbackRedirectUrl="/dashboard" />
+              <SignIn routing="path" path="/login" fallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard" />
             </div>
           } />
           <Route path="/admin/login" element={<AdminLogin />} />
