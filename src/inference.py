@@ -16,11 +16,20 @@ class FeedbackAnalyzer:
         self.threshold = config.CONFIDENCE_THRESHOLD
         
         print(f"Connecting to Hugging Face Serverless API: {model_path}...")
-        self.api_url = f"https://api-inference.huggingface.co/models/{model_path}"
+        self.api_url = f"https://router.huggingface.co/hf-inference/models/{model_path}"
         
         # Will look for HF_TOKEN or HF_KEY in environment
         token = os.getenv("HF_TOKEN") or os.getenv("HF_KEY")
         self.headers = {"Authorization": f"Bearer {token}"} if token else {}
+        
+        # Create a session with retry logic for Render's DNS issues
+        from requests.adapters import HTTPAdapter
+        from urllib3.util.retry import Retry
+        self.session = requests.Session()
+        retry = Retry(total=3, backoff_factor=1, status_forcelist=[ 500, 502, 503, 504 ])
+        adapter = HTTPAdapter(max_retries=retry)
+        self.session.mount('http://', adapter)
+        self.session.mount('https://', adapter)
 
     def get_sentiment(self, text: str) -> str:
         scores = self.sia.polarity_scores(text)
@@ -36,7 +45,7 @@ class FeedbackAnalyzer:
                 "inputs": text,
                 "options": {"wait_for_model": True}
             }
-            response = requests.post(self.api_url, headers=self.headers, json=payload)
+            response = self.session.post(self.api_url, headers=self.headers, json=payload)
             if response.status_code != 200:
                 print(f"API Error: {response.text}")
                 return "other", 0.0, response.text
