@@ -11,12 +11,13 @@ except LookupError:
     nltk.download('vader_lexicon', quiet=True)
 
 class FeedbackAnalyzer:
-    def __init__(self, model_path="models/category_model"):
+    def __init__(self, model_path=config.HF_MODEL_REPO):
         self.sia = SentimentIntensityAnalyzer()
         self.threshold = config.CONFIDENCE_THRESHOLD
         
-        print(f"Loading local offline model from {model_path}...")
-        self.classifier = pipeline("text-classification", model=model_path, tokenizer=model_path)
+        print(f"Downloading/Loading model {model_path} from Hugging Face...")
+        token = os.getenv("HF_TOKEN") or os.getenv("HF_KEY")
+        self.classifier = pipeline("text-classification", model=model_path, tokenizer=model_path, token=token)
 
     def get_sentiment(self, text: str) -> str:
         scores = self.sia.polarity_scores(text)
