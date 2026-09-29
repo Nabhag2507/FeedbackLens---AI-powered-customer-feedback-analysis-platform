@@ -18,8 +18,8 @@ class FeedbackAnalyzer:
         print(f"Connecting to Hugging Face Serverless API: {model_path}...")
         self.api_url = f"https://api-inference.huggingface.co/models/{model_path}"
         
-        # Will look for HF_TOKEN in environment
-        token = os.getenv("HF_TOKEN")
+        # Will look for HF_TOKEN or HF_KEY in environment
+        token = os.getenv("HF_TOKEN") or os.getenv("HF_KEY")
         self.headers = {"Authorization": f"Bearer {token}"} if token else {}
 
     def get_sentiment(self, text: str) -> str:
@@ -31,7 +31,12 @@ class FeedbackAnalyzer:
 
     def get_category_and_confidence(self, text: str):
         try:
-            response = requests.post(self.api_url, headers=self.headers, json={"inputs": text})
+            # Add wait_for_model to handle cold starts in production
+            payload = {
+                "inputs": text,
+                "options": {"wait_for_model": True}
+            }
+            response = requests.post(self.api_url, headers=self.headers, json=payload)
             if response.status_code != 200:
                 print(f"API Error: {response.text}")
                 return "other", 0.0
@@ -42,6 +47,14 @@ class FeedbackAnalyzer:
                 top_pred = predictions[0][0]
                 category = top_pred.get("label", "other")
                 confidence = top_pred.get("score", 0.0)
+                
+                # Fallback mapping if HF returns LABEL_0 instead of the actual string
+                if category.startswith("LABEL_"):
+                    try:
+                        label_id = int(category.split("_")[1])
+                        category = config.ID_TO_LABEL.get(label_id, "other")
+                    except ValueError:
+                        pass
                 
                 if confidence < self.threshold:
                     category = "Other"
