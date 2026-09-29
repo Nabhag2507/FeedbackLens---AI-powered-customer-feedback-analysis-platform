@@ -39,7 +39,7 @@ class FeedbackAnalyzer:
             response = requests.post(self.api_url, headers=self.headers, json=payload)
             if response.status_code != 200:
                 print(f"API Error: {response.text}")
-                return "other", 0.0
+                return "other", 0.0, response.text
                 
             predictions = response.json()
             if isinstance(predictions, list) and len(predictions) > 0 and isinstance(predictions[0], list):
@@ -59,20 +59,23 @@ class FeedbackAnalyzer:
                 if confidence < self.threshold:
                     category = "Other"
                     
-                return category.lower(), round(confidence, 2)
+                return category.lower(), round(confidence, 2), None
             else:
-                return "other", 0.0
+                return "other", 0.0, f"Unexpected format: {predictions}"
         except Exception as e:
             print(f"Request failed: {e}")
-            return "other", 0.0
+            return "other", 0.0, str(e)
 
     def analyze(self, text: str) -> str:
         sentiment = self.get_sentiment(text)
-        category, confidence = self.get_category_and_confidence(text)
+        category, confidence, error = self.get_category_and_confidence(text)
         
         result = {
             "sentiment": sentiment,
             "category": category,
             "confidence": confidence
         }
+        if error:
+            result["debug_error"] = error
+            
         return json.dumps(result, indent=4)
