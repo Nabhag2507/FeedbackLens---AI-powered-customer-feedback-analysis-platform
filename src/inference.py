@@ -1,9 +1,9 @@
 import json
-import requests
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import nltk
 from src import config
 import os
+from transformers import pipeline
 
 try:
     nltk.data.find('sentiment/vader_lexicon.zip')
@@ -11,25 +11,12 @@ except LookupError:
     nltk.download('vader_lexicon', quiet=True)
 
 class FeedbackAnalyzer:
-    def __init__(self, model_path: str = config.HF_MODEL_REPO):
+    def __init__(self, model_path="models/category_model"):
         self.sia = SentimentIntensityAnalyzer()
         self.threshold = config.CONFIDENCE_THRESHOLD
         
-        print(f"Connecting to Hugging Face Serverless API: {model_path}...")
-        self.api_url = f"https://router.huggingface.co/hf-inference/models/{model_path}"
-        
-        # Will look for HF_TOKEN or HF_KEY in environment
-        token = os.getenv("HF_TOKEN") or os.getenv("HF_KEY")
-        self.headers = {"Authorization": f"Bearer {token}"} if token else {}
-        
-        # Create a session with retry logic for Render's DNS issues
-        from requests.adapters import HTTPAdapter
-        from urllib3.util.retry import Retry
-        self.session = requests.Session()
-        retry = Retry(total=3, backoff_factor=1, status_forcelist=[ 500, 502, 503, 504 ])
-        adapter = HTTPAdapter(max_retries=retry)
-        self.session.mount('http://', adapter)
-        self.session.mount('https://', adapter)
+        print(f"Loading local offline model from {model_path}...")
+        self.classifier = pipeline("text-classification", model=model_path, tokenizer=model_path)
 
     def get_sentiment(self, text: str) -> str:
         scores = self.sia.polarity_scores(text)
@@ -40,37 +27,22 @@ class FeedbackAnalyzer:
 
     def get_category_and_confidence(self, text: str):
         try:
-            # Add wait_for_model to handle cold starts in production
-            payload = {
-                "inputs": text,
-                "options": {"wait_for_model": True}
-            }
-            response = self.session.post(self.api_url, headers=self.headers, json=payload)
-            if response.status_code != 200:
-                print(f"API Error: {response.text}")
-                return "other", 0.0, response.text
+            result = self.classifier(text)[0]
+            category = result["label"]
+            confidence = result["score"]
+            
+            # Fallback mapping if HF returns LABEL_0 instead of the actual string
+            if category.startswith("LABEL_"):
+                try:
+                    label_id = int(category.split("_")[1])
+                    category = config.ID_TO_LABEL.get(label_id, "other")
+                except ValueError:
+                    pass
+            
+            if confidence < self.threshold:
+                category = "other"
                 
-            predictions = response.json()
-            if isinstance(predictions, list) and len(predictions) > 0 and isinstance(predictions[0], list):
-                # HF API returns list of lists: [[{'label': 'praise', 'score': 0.9}, ...]]
-                top_pred = predictions[0][0]
-                category = top_pred.get("label", "other")
-                confidence = top_pred.get("score", 0.0)
-                
-                # Fallback mapping if HF returns LABEL_0 instead of the actual string
-                if category.startswith("LABEL_"):
-                    try:
-                        label_id = int(category.split("_")[1])
-                        category = config.ID_TO_LABEL.get(label_id, "other")
-                    except ValueError:
-                        pass
-                
-                if confidence < self.threshold:
-                    category = "Other"
-                    
-                return category.lower(), round(confidence, 2), None
-            else:
-                return "other", 0.0, f"Unexpected format: {predictions}"
+            return category.lower(), round(confidence, 2), None
         except Exception as e:
             print(f"Request failed: {e}")
             return "other", 0.0, str(e)
